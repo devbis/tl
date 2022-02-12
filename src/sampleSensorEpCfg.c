@@ -28,6 +28,7 @@
  */
 #include "tl_common.h"
 #include "zcl_include.h"
+#include "zcl_relative_humidity.h"
 #include "sampleSensor.h"
 
 /**********************************************************************

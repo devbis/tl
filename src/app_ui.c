@@ -32,6 +32,9 @@
 #include "sampleSensor.h"
 #include "app_ui.h"
 
+#include "sensor.h"
+#include "sampleSensor.h"
+
 /**********************************************************************
  * LOCAL CONSTANTS
  */
@@ -215,5 +218,38 @@ void app_key_handler(void){
 		}
 	}
 }
+
+
+s32 zclSensorTimerCb(void *arg)
+{
+	u32 interval = g_sensorAppCtx.readSensorTime;
+	s16 temp = 0;
+	u16 humi = 0;
+
+	read_sensor(&temp,&humi);
+	g_zcl_temperatureAttrs.measuredValue = temp;
+	g_zcl_relHumidityAttrs.measuredValue = humi;
+
+	return interval;
+}
+
+void read_sensor_start(u16 delayTime)
+{
+	u32 interval = 0;
+	s16 temp = 0;
+	u16 humi = 0;
+
+	if(!g_sensorAppCtx.timerReadSensorEvt){
+		read_sensor(&temp,&humi);
+		g_zcl_temperatureAttrs.measuredValue = temp;
+		g_zcl_relHumidityAttrs.measuredValue = humi;
+
+		interval = delayTime;
+		g_sensorAppCtx.readSensorTime = delayTime;
+
+		g_sensorAppCtx.timerReadSensorEvt = TL_ZB_TIMER_SCHEDULE(zclSensorTimerCb, NULL, interval);
+	}
+}
+
 
 #endif  /* __PROJECT_TL_CONTACT_SENSOR__ */
